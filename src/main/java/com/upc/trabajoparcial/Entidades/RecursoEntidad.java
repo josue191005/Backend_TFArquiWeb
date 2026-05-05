@@ -32,7 +32,7 @@ public class RecursoEntidad {
     private String url;
 
     @Enumerated(EnumType.STRING)
-    private RecursoCategoria category;
+    private RecursoCategory category;
 
     @ManyToOne
     @JoinColumn(name = "uploaded_by")
