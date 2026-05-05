@@ -1,0 +1,40 @@
+package com.upc.trabajoparcial.entidad;
+
+import com.upc.trabajoparcial.entidad.enums.EventoTipo;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "evento")
+@Getter
+@Setter
+public class EventoEntidad {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private UsuarioEntidad user;
+
+    @Enumerated(EnumType.STRING)
+    private EventoTipo type;
+
+    @Column(nullable = false)
+    private String title;
+
+    private String description;
+
+    @Column(nullable = false)
+    private LocalDateTime eventDatetime;
+
+    @Column(columnDefinition = "boolean default false")
+    private Boolean isRecurring;
+
+    private String googleEventId;
+
+}
