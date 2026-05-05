@@ -1,6 +1,6 @@
 package com.upc.trabajoparcial.Entidades;
 
-public enum RecursoCategoria {
+public enum RecursoCategory {
     MEDITATION,
     MUSIC,
     ADVISORY_DOC,
