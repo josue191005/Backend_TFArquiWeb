@@ -26,4 +26,15 @@ public class AuthControlador {
     public ResponseEntity<AuthResDTO> login(@RequestBody LoginReqDTO dto) {
         return ResponseEntity.ok(authServicio.login(dto));
     }
+
+    // US24: Cerrar sesión
+    @PostMapping("/logout")
+    public org.springframework.http.ResponseEntity<java.util.Map<String, String>> logout() {
+        // En arquitecturas stateless (JWT), el borrado real del token ocurre en el Frontend.
+        // Aquí devuelve la confirmación de éxito.
+        java.util.Map<String, String> response = new java.util.HashMap<>();
+        response.put("mensaje", "Sesión cerrada exitosamente. El cliente debe desechar el token.");
+
+        return org.springframework.http.ResponseEntity.ok(response);
+    }
 }
