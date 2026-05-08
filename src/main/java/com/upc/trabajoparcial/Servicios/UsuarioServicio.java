@@ -40,6 +40,29 @@ public class UsuarioServicio {
         return mapToDTO(usuario);
     }
 
+    public UsuarioDTO updateProfile(Long id, com.upc.trabajoparcial.DTOs.UsuarioUpdateDTO updateDTO) {
+        // 1. Busca al usuario existente
+        UsuarioEntidad usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + id));
+
+        // 2. Actualiza SOLO los campos permitidos si no vienen nulos o vacíos
+        if (updateDTO.getName() != null && !updateDTO.getName().trim().isEmpty()) {
+            usuario.setName(updateDTO.getName());
+        }
+        if (updateDTO.getPauseThresholdMinutes() != null) {
+            usuario.setPauseThresholdMinutes(updateDTO.getPauseThresholdMinutes());
+        }
+        if (updateDTO.getDailyGoalMinutes() != null) {
+            usuario.setDailyGoalMinutes(updateDTO.getDailyGoalMinutes());
+        }
+
+        // 3. Guarda los cambios.
+        usuario = usuarioRepository.save(usuario);
+
+        // 4. Retorna el DTO actualizado
+        return modelMapper.map(usuario, UsuarioDTO.class);
+    }
+
     public List<UsuarioDTO> listAll() {
         return usuarioRepository.findAll().stream()
                 .map(this::mapToDTO)

@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.upc.trabajoparcial.DTOs.UsuarioUpdateDTO;
 
 import java.util.List;
 
@@ -37,5 +38,15 @@ public class UsuarioControlador {
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         usuarioService.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    // US13: Configuración de Perfil
+    @PutMapping("/{id}/profile")
+    public ResponseEntity<UsuarioDTO> updateProfile(
+            @PathVariable Long id,
+            @RequestBody UsuarioUpdateDTO updateDTO) {
+
+        UsuarioDTO usuarioActualizado = usuarioService.updateProfile(id, updateDTO);
+        return ResponseEntity.ok(usuarioActualizado);
     }
 }
