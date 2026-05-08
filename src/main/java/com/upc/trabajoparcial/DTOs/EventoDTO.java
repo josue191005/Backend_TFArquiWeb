@@ -1,6 +1,6 @@
 package com.upc.trabajoparcial.DTOs;
 
-import com.upc.trabajoparcial.entidad.EventoType;
+import com.upc.trabajoparcial.Entidades.EventoType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,7 +15,7 @@ public class EventoDTO {
 
     private Long id;
     private Long userId;
-    private EventoTipo type;
+    private EventoType type;
     private String title;
     private String description;
     private LocalDateTime eventDatetime;

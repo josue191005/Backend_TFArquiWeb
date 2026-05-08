@@ -8,14 +8,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/recursos")
+@RequestMapping("/api/v1/resources")
 public class RecursoControlador {
 
     @Autowired
-    private RecursoService recursoService;
+    private RecursoServicio recursoService;
 
     @PostMapping
     public ResponseEntity<RecursoDTO> crear(@RequestBody RecursoDTO dto) {
@@ -28,12 +27,12 @@ public class RecursoControlador {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<RecursoDTO> obtener(@PathVariable UUID id) {
+    public ResponseEntity<RecursoDTO> obtener(@PathVariable Long id) {
         return new ResponseEntity<>(recursoService.obtener(id), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(@PathVariable UUID id) {
+    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         recursoService.eliminar(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }

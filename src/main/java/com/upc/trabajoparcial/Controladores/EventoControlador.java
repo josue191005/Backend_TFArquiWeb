@@ -14,7 +14,7 @@ import java.util.List;
 public class EventoControlador {
 
     @Autowired
-    private EventoService eventoService;
+    private EventoServicio eventoService;
 
     @PostMapping
     public ResponseEntity<EventoDTO> crear(@RequestBody EventoDTO dto) {

@@ -5,19 +5,19 @@ import com.upc.trabajoparcial.Entidades.RecursoEntidad;
 import com.upc.trabajoparcial.Repositorios.RecursoRepositorio;
 import com.upc.trabajoparcial.Repositorios.UsuarioRepositorio;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.UUID;
 
 @Service
-public class RecursoService {
-    
+public class RecursoServicio {
+
     @Autowired
     private RecursoRepositorio recursoRepositorio;
 
     @Autowired
-    private UsuarioRepositorio usuarioReporio;
+    private UsuarioRepositorio usuarioRepositorio;
 
     @Autowired
     private ModelMapper modelMapper;
@@ -27,29 +27,29 @@ public class RecursoService {
 
         if (dto.getUploadedById() != null) {
             r.setUploadedBy(
-                usuarioRepositorio.findById(dto.getUploadedById())
-                    .orElseThrow(() -> new RuntimeException("Usuario no existe"))
+                    usuarioRepositorio.findById(dto.getUploadedById())
+                            .orElseThrow(() -> new RuntimeException("Usuario no existe"))
             );
         }
 
-        return modelMapper.map(usuarioReporio.save(r), RecursoDTO.class);
+        return modelMapper.map(recursoRepositorio.save(r), RecursoDTO.class);
     }
 
     public List<RecursoDTO> listar() {
-        return usuarioReporio.findAll()
+        return recursoRepositorio.findAll()
                 .stream()
                 .map(r -> modelMapper.map(r, RecursoDTO.class))
                 .toList();
     }
 
-    public RecursoDTO obtener(UUID id) {
+    public RecursoDTO obtener(Long id) {
         return modelMapper.map(
-                usuarioReporio.findById(id).orElseThrow(),
+                recursoRepositorio.findById(id).orElseThrow(),
                 RecursoDTO.class
         );
     }
 
-    public void eliminar(UUID id) {
-        usuarioReporio.deleteById(id);
+    public void eliminar(Long id) {
+        recursoRepositorio.deleteById(id);
     }
 }
