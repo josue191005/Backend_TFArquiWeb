@@ -36,4 +36,13 @@ public class RecursoControlador {
         recursoService.eliminar(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    // US11: Subir materiales a la nube
+    @PostMapping(value = "/upload", consumes = org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<RecursoDTO> subirMaterial(
+            @RequestPart("file") org.springframework.web.multipart.MultipartFile file,
+            @RequestPart("recurso") RecursoDTO dto) {
+
+        return new ResponseEntity<>(recursoService.subirArchivoYCrear(file, dto), HttpStatus.CREATED);
+    }
 }

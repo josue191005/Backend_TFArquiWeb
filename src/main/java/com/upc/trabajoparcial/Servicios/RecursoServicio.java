@@ -22,6 +22,9 @@ public class RecursoServicio {
     @Autowired
     private ModelMapper modelMapper;
 
+    @Autowired
+    private com.cloudinary.Cloudinary cloudinary;
+
     public RecursoDTO crear(RecursoDTO dto) {
         RecursoEntidad r = modelMapper.map(dto, RecursoEntidad.class);
 
@@ -51,5 +54,21 @@ public class RecursoServicio {
 
     public void eliminar(Long id) {
         recursoRepositorio.deleteById(id);
+    }
+
+    public RecursoDTO subirArchivoYCrear(org.springframework.web.multipart.MultipartFile archivo, RecursoDTO dto) {
+        try {
+            // 1. Subir archivo a la nube
+            java.util.Map uploadResult = cloudinary.uploader().upload(archivo.getBytes(), com.cloudinary.utils.ObjectUtils.emptyMap());
+            String urlObtenida = uploadResult.get("url").toString();
+
+            // 2. Asignar la URL que nos dio la nube al DTO
+            dto.setUrl(urlObtenida);
+
+            // 3. Guardar en base de datos usando el método ya existente
+            return crear(dto);
+        } catch (java.io.IOException e) {
+            throw new RuntimeException("Error al subir el archivo a Cloud Storage");
+        }
     }
 }
