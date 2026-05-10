@@ -8,7 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -56,5 +58,28 @@ public class LogroServicio {
     @Transactional
     public void eliminar(Long id) {
         logroRepositorio.deleteById(id);
+    }
+
+    public Long obtenerNuevoLogro(Integer puntos) {
+        Long logroId = null;
+        int puntosMaximos = -1;
+
+        for (LogroEntidad logro : logroRepositorio.findAll()) {
+            if (puntos >= logro.getPuntosRequeridos()) {
+                if (logro.getPuntosRequeridos() > puntosMaximos) {
+                    logroId = logro.getId();
+                    puntosMaximos = logro.getPuntosRequeridos();
+                }
+            }
+        }
+
+        return logroId;
+    }
+
+    public Map<String, Object> obtenerEstadoGamificacion(Integer puntos) {
+        Map<String, Object> respuesta = new HashMap<>();
+        respuesta.put("PuntosGanados", puntos);
+        respuesta.put("nuevoLogro", obtenerNuevoLogro(puntos));
+        return respuesta;
     }
 }
