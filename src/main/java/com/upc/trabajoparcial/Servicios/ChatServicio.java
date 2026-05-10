@@ -3,10 +3,14 @@ package com.upc.trabajoparcial.Servicios;
 import com.upc.trabajoparcial.DTOs.ChatDTO;
 import com.upc.trabajoparcial.DTOs.MensajeDTO;
 import com.upc.trabajoparcial.Entidades.ChatEntidad;
+import com.upc.trabajoparcial.Entidades.ChatStatus;
+import com.upc.trabajoparcial.Entidades.ChatType;
 import com.upc.trabajoparcial.Entidades.MensajeEntidad;
+import com.upc.trabajoparcial.Entidades.PacienteAPsicologoEntidad;
 import com.upc.trabajoparcial.Entidades.UsuarioEntidad;
 import com.upc.trabajoparcial.Repositorios.ChatRepositorio;
 import com.upc.trabajoparcial.Repositorios.MensajeRepositorio;
+import com.upc.trabajoparcial.Repositorios.PacienteAPsicologoRepositorio;
 import com.upc.trabajoparcial.Repositorios.UsuarioRepositorio;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +33,9 @@ public class ChatServicio {
 
     @Autowired
     private UsuarioRepositorio usuarioRepositorio;
+
+    @Autowired
+    private PacienteAPsicologoRepositorio pacienteAPsicologoRepositorio;
 
     @Autowired
     private ModelMapper modelMapper;
@@ -103,5 +110,21 @@ public class ChatServicio {
         messagingTemplate.convertAndSend("/topic/chat/" + chat.getId(), respuesta);
 
         return respuesta;
+    }
+
+    public ChatDTO solicitarChatEmergencia(Long patientId) {
+        UsuarioEntidad paciente = usuarioRepositorio.findById(patientId)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        PacienteAPsicologoEntidad relacion = pacienteAPsicologoRepositorio.findFirstByPacienteId(patientId)
+                .orElseThrow(() -> new RuntimeException("Psicologo no asignado"));
+
+        ChatEntidad chat = new ChatEntidad();
+        chat.setPatient(paciente);
+        chat.setPsychologist(relacion.getPsicologo());
+        chat.setType(ChatType.EMERGENCY);
+        chat.setStatus(ChatStatus.ACTIVE);
+
+        return modelMapper.map(repo.save(chat), ChatDTO.class);
     }
 }
