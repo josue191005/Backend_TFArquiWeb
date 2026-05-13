@@ -49,7 +49,6 @@ public class GoogleCalendarService {
         return new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
     }
 
-    //ACTUALIZADO: Retorna String (Google ID) y recibe la descripción del evento
     public String crearEvento(String resumen, String descripcion, String fechaInicio, String fechaFin) throws IOException, GeneralSecurityException {
         final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
         Calendar service = new Calendar.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
@@ -73,7 +72,6 @@ public class GoogleCalendarService {
         event = service.events().insert("primary", event).execute();
         System.out.printf("Evento despachado a Google Calendar exitosamente: %s\n", event.getHtmlLink());
 
-        // Retornamos el ID al EventoServicio para que lo enlace en la base de datos local
         return event.getId();
     }
 }

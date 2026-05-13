@@ -27,26 +27,26 @@ public class EventoServicio {
     @Autowired
     private ModelMapper modelMapper;
 
+    // Formateador estricto para asegurar compatibilidad total con Google Calendar
+    private final DateTimeFormatter googleFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
+
     @Transactional
     public EventoDTO crear(EventoDTO dto) {
-        // 1. Mapeo inicial y validación de existencia del usuario en la BD local
+        // 1. Persistencia local en PostgreSQL
         EventoEntidad e = modelMapper.map(dto, EventoEntidad.class);
         e.setUser(
                 usuarioRepositorio.findById(dto.getUserId())
                         .orElseThrow(() -> new RuntimeException("El usuario especificado no existe en el sistema"))
         );
 
-        // Guarda localmente para obtener el ID autogenerado
         e = eventoRepositorio.save(e);
 
-        // 2. Flujo de despacho a Google Calendar si el flag está activo
+        // 2. Sincronización automática si el flag está activo
         if (dto.isSincronizarConGoogle() && dto.getEventDatetime() != null) {
             try {
-                // Convierte la fecha local al estándar ISO 8601 con zona horaria UTC (Z) para Google
-                String fechaInicio = dto.getEventDatetime().format(DateTimeFormatter.ISO_DATE_TIME) + "Z";
-                String fechaFin = dto.getEventDatetime().plusHours(1).format(DateTimeFormatter.ISO_DATE_TIME) + "Z";
+                String fechaInicio = dto.getEventDatetime().format(googleFormatter);
+                String fechaFin = dto.getEventDatetime().plusHours(1).format(googleFormatter);
 
-                // Invoca al servicio de la nube (que lee el credentials.json internamente)
                 String googleId = googleCalendarService.crearEvento(
                         dto.getTitle(),
                         dto.getDescription(),
@@ -54,12 +54,16 @@ public class EventoServicio {
                         fechaFin
                 );
 
-                // Enlaza el ID devuelto por Google a nuestra entidad y actualizamos
                 e.setGoogleEventId(googleId);
                 e = eventoRepositorio.save(e);
+
+                // ✔️ Mensaje solicitado por el usuario para creación exitosa
+                System.out.println("====================================================");
+                System.out.println("✅ Evento creado exitosamente en Google Calendar");
+                System.out.println("====================================================");
+
             } catch (Exception ex) {
-                // Si Google falla (ej. sin internet), evitamos hacer rollback local para no perder la cita en StayCool
-                System.err.println("Advertencia: Evento guardado localmente, pero falló la sincronización remota: " + ex.getMessage());
+                System.err.println("⚠️ Advertencia: Falló la creación en Google, pero se guardó localmente: " + ex.getMessage());
             }
         }
 
@@ -75,6 +79,48 @@ public class EventoServicio {
         return modelMapper.map(eventoRepositorio.findById(id).orElseThrow(), EventoDTO.class);
     }
 
+    @Transactional
+    public EventoDTO sincronizarConGoogleManual(Long id) {
+        // 1. Buscamos el evento local
+        EventoEntidad e = eventoRepositorio.findById(id)
+                .orElseThrow(() -> new RuntimeException("Evento no encontrado con ID: " + id));
+
+        // 2. Validación para evitar duplicados
+        if (e.getGoogleEventId() != null) {
+            throw new RuntimeException("El evento ya cuenta con un ID de sincronización activo.");
+        }
+
+        try {
+            // 3. Formateo y envío a la nube
+            String fechaInicio = e.getEventDatetime().format(googleFormatter);
+            String fechaFin = e.getEventDatetime().plusHours(1).format(googleFormatter);
+
+            String googleId = googleCalendarService.crearEvento(
+                    e.getTitle(),
+                    e.getDescription(),
+                    fechaInicio,
+                    fechaFin
+            );
+
+            // 4. Actualizamos el registro local con el ID remoto
+            e.setGoogleEventId(googleId);
+            eventoRepositorio.save(e);
+
+            // ✔️ Mensaje solicitado por el usuario para sincronización manual exitosa
+            System.out.println("====================================================");
+            System.out.println("🔄 Evento sincronizado exitosamente en Google Calendar");
+            System.out.println("====================================================");
+
+        } catch (Exception ex) {
+            System.err.println("❌ Fallo crítico en sincronización manual:");
+            ex.printStackTrace();
+            throw new RuntimeException("Error en la API de Google: " + ex.getMessage());
+        }
+
+        return modelMapper.map(e, EventoDTO.class);
+    }
+
+    @Transactional
     public void eliminar(Long id) {
         eventoRepositorio.deleteById(id);
     }
