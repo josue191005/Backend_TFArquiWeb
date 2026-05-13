@@ -27,7 +27,7 @@ public class UsuarioServicio {
     public UsuarioDTO create(UsuarioDTO usuarioDTO) {
         UsuarioEntidad usuario = modelMapper.map(usuarioDTO, UsuarioEntidad.class);
 
-        // Buscamos el rol en la base de datos y se lo asignamos al usuario
+        // Buscamos el rol en la base de datos y se lo asignamos al usuariohhhhhhhhh
         RolEntidad rol = rolRepository.findById(usuarioDTO.getRolId())
                 .orElseThrow(() -> new RuntimeException("Rol no encontrado"));
         usuario.setRolEntidad(rol);
