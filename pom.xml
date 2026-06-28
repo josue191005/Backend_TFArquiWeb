@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.upc</groupId>
-    <artifactId>TrabajoParcial</artifactId>
+    <artifactId>TrabajoFinal</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>TrabajoParcial</name>
-    <description>TrabajoParcial</description>
+    <name>TrabajoFinal</name>
+    <description>Staycool Backend</description>
     <url/>
     <licenses>
         <license/>
@@ -96,6 +96,11 @@
             <groupId>com.google.apis</groupId>
             <artifactId>google-api-services-calendar</artifactId>
             <version>v3-rev20220715-2.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.auth</groupId>
+            <artifactId>google-auth-library-oauth2-http</artifactId>
+            <version>1.16.0</version>
         </dependency>
         <!-- para la us07 WebSockets existan-->
 
